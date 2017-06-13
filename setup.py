@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 from setuptools import setup
@@ -11,10 +10,13 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     # TODO: put package requirements here
+    smbus-cffi
 ]
 
 test_requirements = [
     # TODO: put package test requirements here
+    nose,
+    smbus-cffi
 ]
 
 setup(
