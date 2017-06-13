@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -13,7 +12,6 @@ import sys
 import unittest
 
 from i2c_lcd import i2c_lcd
-
 
 
 class TestI2c_lcd(unittest.TestCase):
