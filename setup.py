@@ -10,13 +10,13 @@ with open('HISTORY.rst') as history_file:
 
 requirements = [
     # TODO: put package requirements here
-    smbus-cffi
+    "smbus-cffi"
 ]
 
 test_requirements = [
     # TODO: put package test requirements here
-    nose,
-    smbus-cffi
+    "nose",
+    "smbus-cffi"
 ]
 
 setup(
