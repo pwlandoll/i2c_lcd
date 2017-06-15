@@ -9,12 +9,12 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
 requirements = [
-    "smbus-cffi"
+    "smbus-cffi>=0.5.1"
 ]
 
 test_requirements = [
     "nose",
-    "smbus-cffi"
+    "smbus-cffi>=0.5.1"
 ]
 
 setup(
