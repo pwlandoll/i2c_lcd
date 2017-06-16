@@ -16,7 +16,7 @@ env:
 - TOXENV=py27
 - TOXENV=py26
 - TOXENV=pypy
-install: pip install -r requirements_dev.txt
+install: pip install -U tox
 language: python
 python: 3.5
 script: tox -e ${TOXENV}
