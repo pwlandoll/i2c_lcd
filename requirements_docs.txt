@@ -1,0 +1,2 @@
+Sphinx
+smbus-cffi>=0.5.1
