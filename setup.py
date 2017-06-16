@@ -13,8 +13,7 @@ requirements = [
 ]
 
 test_requirements = [
-    "nose",
-    "smbus-cffi>=0.5.1"
+    "nose"
 ]
 
 setup(
