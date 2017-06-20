@@ -28,13 +28,19 @@ I2C LCD interface in Python made for RPi.
 Features
 --------
 
-* TODO
+* Interface with I2C-connected LCD screens, by means of the SMBus,
+most commonly with Raspberry Pi boards.
+* Display text on the screen, given as a string or characters.
 
 Credits
 ---------
+
+The code in this package is based almost entirely on code by DenisFromHR
+(Denis Pleic), taken 2017-3-26 from `GitHub Gists`_.
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+.. _GitHub Gists: https://gist.github.com/DenisFromHR/cc863375a6e19dce359d#file-rpi_i2c_driver-py
 
