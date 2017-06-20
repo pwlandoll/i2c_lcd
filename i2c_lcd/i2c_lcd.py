@@ -23,6 +23,7 @@ Made available under GNU GENERAL PUBLIC LICENSE
 import smbus
 from time import *
 
+# TODO: Organize these in some better way, maybe a dict or something?
 # LCD Address
 # Default to 0x27, for RPi3 I2C device
 ADDRESS = 0x27
@@ -75,42 +76,33 @@ Rs = 0b00000001 # Register select bit
 
 
 class i2c_device:
+    """Class for communicating with I2C devices over SMBus.
+
+    Used to help the lcd class communicate with an I2C device via SMBus.
+
+    Args:
+        addr (hex str): Hex address of I2C device
+        port (int): port for SMBus
+    """
     def __init__(self, addr=ADDRESS, port=1):
         self.addr = addr
         self.bus = smbus.SMBus(port)
 
-    # Write a single command
     def write_cmd(self, cmd):
+        """Write a single command.
+
+        Args:
+            cmd (hex str): Hex command.
+        """
         self.bus.write_byte(self.addr, cmd)
         sleep(0.0001)
 
-    # Write a command and argument
-    def write_cmd_arg(self, cmd, data):
-        self.bus.write_byte_data(self.addr, cmd, data)
-        sleep(0.0001)
-
-    # Write a block of data
-    def write_block_data(self, cmd, data):
-        self.bus.write_block_data(self.addr, cmd, data)
-        sleep(0.0001)
-
-    # Read a single byte
-    def read(self):
-        return self.bus.read_byte(self.addr)
-
-    # Read
-    def read_data(self, cmd):
-        return self.bus.read_byte_data(self.addr, cmd)
-
-    # Read a block of data
-    def read_block_data(self, cmd):
-        return self.bus.read_block_data(self.addr, cmd)
-
 
 class lcd:
-    #initializes objects and lcd
-    def __init__(self):
-        self.lcd_device = i2c_device(ADDRESS)
+    """Class for interfacing with I2C LCD device."""
+    def __init__(self, addr=ADDRESS):
+        self.lcd_device = i2c_device(addr)
+        # TODO: Why write all of these? Assuming they're necessary to init.
         self.lcd_write(0x03)
         self.lcd_write(0x03)
         self.lcd_write(0x03)
@@ -122,64 +114,111 @@ class lcd:
         self.lcd_write(LCD_ENTRYMODESET | LCD_ENTRYLEFT)
         sleep(0.2)
 
-
-    # clocks EN to latch command
     def lcd_strobe(self, data):
+        """Clocks enable bit to latch command.
+
+        Args:
+            data: data to write
+        """
         self.lcd_device.write_cmd(data | En | LCD_BACKLIGHT)
         sleep(.0005)
         self.lcd_device.write_cmd(((data & ~En) | LCD_BACKLIGHT))
         sleep(.0001)
 
     def lcd_write_four_bits(self, data):
-      self.lcd_device.write_cmd(data | LCD_BACKLIGHT)
-      self.lcd_strobe(data)
+        """Write four bits of data to lcd device.
+
+        Args:
+            data: data to write
+        """
+        self.lcd_device.write_cmd(data | LCD_BACKLIGHT)
+        self.lcd_strobe(data)
 
     # write a command to lcd
     def lcd_write(self, cmd, mode=0):
+        """Write a command to lcd.
+
+        Args:
+            cmd (hex str): Hex command.
+            mode (int): Mode? Defaults to 0.
+        """
         self.lcd_write_four_bits(mode | (cmd & 0xF0))
         self.lcd_write_four_bits(mode | ((cmd << 4) & 0xF0))
 
-    # write a character to lcd (or character rom) 0x09: backlight | RS=DR<
-    # works!
     def lcd_write_char(self, charvalue, mode=1):
+        """Writes char to lcd.
+
+        Notes from original:
+            "write a character to lcd (or character rom) 0x09:
+            backlight | RS=DR<"
+
+        Args:
+            charvalue (int): ordinal value of character to write.
+            mode (int): Mode? Defaults to 1.
+        """
         self.lcd_write_four_bits(mode | (charvalue & 0xF0))
         self.lcd_write_four_bits(mode | ((charvalue << 4) & 0xF0))
+        # Couldn't we just do this?
+        # self.lcd_write(charvalue, mode=1)
 
-    # put string function
     def lcd_display_string(self, string, line):
+        """Displays string on lcd screen.
+
+        Args:
+            string (str): String to be displayed.
+            line (int): Line for string to be displayed on. Must be 1-4.
+        """
         if line == 1:
             self.lcd_write(0x80)
-        if line == 2:
+        elif line == 2:
             self.lcd_write(0xC0)
-        if line == 3:
+        elif line == 3:
             self.lcd_write(0x94)
-        if line == 4:
+        elif line == 4:
             self.lcd_write(0xD4)
+        else:
+            raise Exception("Line parameter must be 1, 2, 3, or 4.")
 
         for char in string:
             self.lcd_write(ord(char), Rs)
+            # Could we use lcd_write_char?
+            # self.lcd_write_char(char, Rs)
 
-    # clear lcd and set to home
     def lcd_clear(self):
+        """Clear lcd and set to home."""
         self.lcd_write(LCD_CLEARDISPLAY)
         self.lcd_write(LCD_RETURNHOME)
 
-    # define backlight on/off (lcd.backlight(1); off= lcd.backlight(0)
-    def backlight(self, state): # for state, 1 = on, 0 = off
-        if state == 1:
+    def backlight_on(self, set_to_on):
+        """Define backlight as on/off.
+
+        Args:
+            set_to_on (bool): True sets backlight on, False sets off.
+        """
+        if set_to_on:
             self.lcd_device.write_cmd(LCD_BACKLIGHT)
-        elif state == 0:
+        else:
             self.lcd_device.write_cmd(LCD_NOBACKLIGHT)
 
-    # add custom characters (0 - 7)
     def lcd_load_custom_chars(self, fontdata):
-        self.lcd_write(0x40);
-        for char in fontdata:
-            for line in char:
-                self.lcd_write_char(line)
+        """Load custom characters from font data.
 
-    # define precise positioning (addition from the forum)
+        Args:
+            fontdata (char[]): font data, max 7 characters.
+        """
+        self.lcd_write(0x40)
+        for line in fontdata:
+            for char in line:
+                self.lcd_write_char(char)
+
     def lcd_display_string_pos(self, string, line, pos):
+        """Display string in precise position/offset.
+
+        Args:
+            string (str): String to be displayed.
+            line (int): Line for string to be displayed on. Must be 1-4.
+            pos (int): Offset for displaying string
+        """
         if line == 1:
             pos_new = pos
         elif line == 2:
@@ -188,9 +227,13 @@ class lcd:
             pos_new = 0x14 + pos
         elif line == 4:
             pos_new = 0x54 + pos
+        else:
+            raise Exception("Line parameter must be 1, 2, 3, or 4.")
 
         self.lcd_write(0x80 + pos_new)
 
         for char in string:
             self.lcd_write(ord(char), Rs)
+            # Could we use lcd_write_char?
+            # self.lcd_write_char(char, Rs)
 
