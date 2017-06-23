@@ -28,8 +28,7 @@ I2C LCD interface in Python made for RPi.
 Features
 --------
 
-* Interface with I2C-connected LCD screens, by means of the SMBus,
-most commonly with Raspberry Pi boards.
+* Interface with I2C-connected LCD screens, by means of the SMBus, most commonly with Raspberry Pi boards.
 * Display text on the screen, given as a string or characters.
 
 Credits
