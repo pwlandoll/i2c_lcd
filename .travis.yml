@@ -10,12 +10,11 @@ deploy:
   provider: pypi
   user: pwlandoll
 env:
+- TOXENV=py36
 - TOXENV=py35
 - TOXENV=py34
-- TOXENV=py33
 - TOXENV=py27
-- TOXENV=py26
 install: pip install -U tox
 language: python
-python: 3.5
+python: 3.6
 script: tox -e ${TOXENV}
