@@ -1,2 +1,2 @@
-Sphinx==1.6.3
+Sphinx==3.0.2
 smbus-cffi>=0.5.1
